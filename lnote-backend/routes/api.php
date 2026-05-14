@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Models\ServicePrice;
 
@@ -26,6 +27,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('transactions', TransactionController::class);
     Route::patch('transactions/{id}/status', [TransactionController::class, 'updateStatus']);
     Route::patch('transactions/{id}/payment', [TransactionController::class, 'updatePayment']);
+    Route::get('reports/daily', [ReportController::class, 'daily']);
+    Route::get('reports/summary', [ReportController::class, 'summary']);
 
     Route::get('service-prices', function () {
         return response()->json([

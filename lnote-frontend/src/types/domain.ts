@@ -43,3 +43,18 @@ export type Transaction = {
   service_price?: ServicePrice;
   servicePrice?: ServicePrice;
 };
+
+export type DailyReport = {
+  date: string;
+  total_revenue: number;
+  transaction_count: number;
+  unpaid_count: number;
+};
+
+export type SummaryReport = {
+  from: string;
+  to: string;
+  total_revenue: number;
+  transaction_count: number;
+  unpaid_count: number;
+};
