@@ -3,52 +3,39 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\StoreCustomerRequest;
+use App\Http\Requests\Customer\UpdateCustomerRequest;
 use App\Models\Customer;
-use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
     public function index()
     {
-        return response()->json(Customer::all());
+        return $this->successResponse(Customer::latest()->get(), 'Customers fetched.');
     }
 
-    public function store(Request $request)
+    public function store(StoreCustomerRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-        ]);
-
-        $customer = Customer::create($data);
-        return response()->json($customer, 201);
+        $customer = Customer::create($request->validated());
+        return $this->successResponse($customer, 'Customer created.', 201);
     }
 
     public function show($id)
     {
-        return response()->json(Customer::findOrFail($id));
+        return $this->successResponse(Customer::findOrFail($id), 'Customer fetched.');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateCustomerRequest $request, $id)
     {
         $customer = Customer::findOrFail($id);
-        $data = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'phone' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-        ]);
-
-        $customer->update($data);
-        return response()->json($customer);
+        $customer->update($request->validated());
+        return $this->successResponse($customer->fresh(), 'Customer updated.');
     }
 
     public function destroy($id)
     {
         $customer = Customer::findOrFail($id);
         $customer->delete();
-        return response()->json(null, 204);
+        return $this->successResponse(null, 'Customer deleted.');
     }
 }
