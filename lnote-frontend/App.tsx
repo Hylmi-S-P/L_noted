@@ -1,52 +1,97 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ActivityIndicator, Platform } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Button } from 'react-native';
 import AddTransactionScreen from './src/screens/AddTransactionScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import DashboardScreen from './src/screens/DashboardScreen';
+import HistoryScreen from './src/screens/HistoryScreen';
+import TransactionDetailScreen from './src/screens/TransactionDetailScreen';
+import { me, logout } from './src/services/api/authService';
+import { setUnauthorizedHandler } from './src/services/api/client';
+import { User } from './src/types/domain';
 
-const Stack = createNativeStackNavigator();
+type RootStackParamList = {
+  Login: undefined;
+  Dashboard: undefined;
+  AddTransaction: undefined;
+  History: undefined;
+  TransactionDetail: { id: number };
+};
 
-function DashboardScreen() {
-  const [status, setStatus] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Default to localhost; on Android emulator you might need 10.0.2.2
-    const host = Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://127.0.0.1:8000';
-    fetch(`${host}/api/health`)
-      .then((r) => r.json())
-      .then((json) => setStatus(json.status))
-      .catch((err) => setStatus('error'))
-      .finally(() => setLoading(false));
-  }, []);
-
-  return (
-    <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator />
-      ) : (
-        <Text style={styles.statusText}>Health: {status}</Text>
-      )}
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
+  const [booting, setBooting] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const boot = async () => {
+      try {
+        const currentUser = await me();
+        setUser(currentUser);
+      } catch {
+        setUser(null);
+      } finally {
+        setBooting(false);
+      }
+    };
+
+    setUnauthorizedHandler(() => setUser(null));
+    void boot();
+
+    return () => setUnauthorizedHandler(null);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      setUser(null);
+    }
+  };
+
+  if (booting) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Dashboard"
-          component={DashboardScreen}
-          options={({ navigation }) => ({
-            headerRight: () => <Button title="Add" onPress={() => navigation.navigate('AddTransaction')} />,
-          })}
-        />
-        <Stack.Screen name="AddTransaction" component={AddTransactionScreen} options={{ title: 'Add Transaction' }} />
-      </Stack.Navigator>
+      {user ? (
+        <Stack.Navigator>
+          <Stack.Screen name="Dashboard">
+            {({ navigation }) => (
+              <DashboardScreen
+                user={user}
+                onOpenAdd={() => navigation.navigate('AddTransaction')}
+                onOpenHistory={() => navigation.navigate('History')}
+                onLogout={handleLogout}
+              />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="AddTransaction" component={AddTransactionScreen} options={{ title: 'Add Transaction' }} />
+          <Stack.Screen name="History">
+            {({ navigation }) => (
+              <HistoryScreen onOpenDetail={(id) => navigation.navigate('TransactionDetail', { id })} />
+            )}
+          </Stack.Screen>
+          <Stack.Screen name="TransactionDetail" options={{ title: 'Transaction Detail' }}>
+            {({ route }) => <TransactionDetailScreen transactionId={route.params.id} />}
+          </Stack.Screen>
+        </Stack.Navigator>
+      ) : (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login">
+            {() => <LoginScreen onLoginSuccess={setUser} />}
+          </Stack.Screen>
+        </Stack.Navigator>
+      )}
+      <StatusBar style="auto" />
     </NavigationContainer>
   );
 }
@@ -58,9 +103,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
-  },
-  statusText: {
-    fontSize: 18,
-    fontWeight: '600',
   },
 });
