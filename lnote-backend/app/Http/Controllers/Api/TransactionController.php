@@ -9,12 +9,43 @@ use App\Http\Requests\Transaction\UpdateTransactionRequest;
 use App\Http\Requests\Transaction\UpdateTransactionStatusRequest;
 use App\Models\Transaction;
 use App\Models\ServicePrice;
+use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::with(['customer', 'servicePrice', 'user'])->latest()->get();
+        $validated = $request->validate([
+            'date' => ['nullable', 'date'],
+            'status' => ['nullable', 'string', 'in:pending,proses,selesai,diambil'],
+            'customer' => ['nullable', 'string', 'max:255'],
+            'payment_status' => ['nullable', 'string', 'in:belum_lunas,lunas'],
+        ]);
+
+        $query = Transaction::query()
+            ->with(['customer', 'servicePrice', 'user'])
+            ->where('user_id', auth()->id());
+
+        if (!empty($validated['date'])) {
+            $query->whereDate('created_at', $validated['date']);
+        }
+
+        if (!empty($validated['status'])) {
+            $query->where('status', $validated['status']);
+        }
+
+        if (!empty($validated['payment_status'])) {
+            $query->where('payment_status', $validated['payment_status']);
+        }
+
+        if (!empty($validated['customer'])) {
+            $search = $validated['customer'];
+            $query->whereHas('customer', function ($subQuery) use ($search) {
+                $subQuery->where('name', 'like', '%'.$search.'%');
+            });
+        }
+
+        $transactions = $query->latest()->get();
         return $this->successResponse($transactions, 'Transactions fetched.');
     }
 

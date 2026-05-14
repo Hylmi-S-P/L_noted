@@ -21,6 +21,16 @@ export async function getTransactions(): Promise<Transaction[]> {
   return response.data.data;
 }
 
+export async function getFilteredTransactions(params: {
+  status?: string;
+  payment_status?: string;
+  customer?: string;
+  date?: string;
+}): Promise<Transaction[]> {
+  const response = await apiClient.get<ApiEnvelope<Transaction[]>>('/transactions', { params });
+  return response.data.data;
+}
+
 export async function getTransaction(id: number): Promise<Transaction> {
   const response = await apiClient.get<ApiEnvelope<Transaction>>(`/transactions/${id}`);
   return response.data.data;

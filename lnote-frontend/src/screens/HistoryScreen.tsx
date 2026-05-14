@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { getTransactions } from '../services/api/transactionService';
+import { getFilteredTransactions } from '../services/api/transactionService';
 import { Transaction } from '../types/domain';
 
 type Props = {
@@ -14,13 +14,19 @@ export default function HistoryScreen({ onOpenDetail }: Props) {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
 
   const loadTransactions = async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
 
     try {
-      const data = await getTransactions();
+      const data = await getFilteredTransactions({
+        status: statusFilter === 'all' ? undefined : statusFilter,
+        payment_status: paymentFilter === 'all' ? undefined : paymentFilter,
+        customer: search.trim().length > 0 ? search.trim() : undefined,
+        date: dateFilter.trim().length > 0 ? dateFilter.trim() : undefined,
+      });
       setTransactions(data);
     } finally {
       setLoading(false);
@@ -30,18 +36,7 @@ export default function HistoryScreen({ onOpenDetail }: Props) {
 
   useEffect(() => {
     void loadTransactions();
-  }, []);
-
-  const filtered = useMemo(() => {
-    const loweredSearch = search.toLowerCase();
-    return transactions.filter((txn) => {
-      const customerName = txn.customer?.name?.toLowerCase() ?? '';
-      const statusOk = statusFilter === 'all' || txn.status === statusFilter;
-      const paymentOk = paymentFilter === 'all' || txn.payment_status === paymentFilter;
-      const searchOk = loweredSearch.length === 0 || customerName.includes(loweredSearch);
-      return statusOk && paymentOk && searchOk;
-    });
-  }, [paymentFilter, search, statusFilter, transactions]);
+  }, [statusFilter, paymentFilter]);
 
   return (
     <ScrollView
@@ -56,6 +51,12 @@ export default function HistoryScreen({ onOpenDetail }: Props) {
         placeholder="Search customer..."
         style={styles.input}
       />
+      <TextInput
+        value={dateFilter}
+        onChangeText={setDateFilter}
+        placeholder="Date filter (YYYY-MM-DD)"
+        style={styles.input}
+      />
 
       <View style={styles.filters}>
         <TouchableOpacity style={styles.filterChip} onPress={() => setStatusFilter(statusFilter === 'all' ? 'proses' : 'all')}>
@@ -64,12 +65,15 @@ export default function HistoryScreen({ onOpenDetail }: Props) {
         <TouchableOpacity style={styles.filterChip} onPress={() => setPaymentFilter(paymentFilter === 'all' ? 'lunas' : 'all')}>
           <Text style={styles.filterText}>Payment: {paymentFilter}</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.filterChip} onPress={() => loadTransactions()}>
+          <Text style={styles.filterText}>Apply</Text>
+        </TouchableOpacity>
       </View>
 
       {loading ? (
         <ActivityIndicator style={{ marginTop: 20 }} />
       ) : (
-        filtered.map((txn) => (
+        transactions.map((txn) => (
           <TouchableOpacity key={txn.id} style={styles.card} onPress={() => onOpenDetail(txn.id)}>
             <Text style={styles.cardTitle}>{txn.customer?.name ?? 'Unknown Customer'}</Text>
             <Text>Amount: Rp {txn.amount.toLocaleString()}</Text>
@@ -79,7 +83,7 @@ export default function HistoryScreen({ onOpenDetail }: Props) {
         ))
       )}
 
-      {!loading && filtered.length === 0 ? <Text style={styles.empty}>No transactions found.</Text> : null}
+      {!loading && transactions.length === 0 ? <Text style={styles.empty}>No transactions found.</Text> : null}
     </ScrollView>
   );
 }
