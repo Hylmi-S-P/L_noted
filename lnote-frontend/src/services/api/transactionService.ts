@@ -35,3 +35,30 @@ export async function updateTransactionPayment(id: number, payment_status: Trans
   const response = await apiClient.patch<ApiEnvelope<Transaction>>(`/transactions/${id}/payment`, { payment_status });
   return response.data.data;
 }
+
+export async function scanReceiptImage(uri: string): Promise<{
+  receipt_image_path: string;
+  raw_text: string;
+  total_price: number | null;
+  confidence: number;
+}> {
+  const form = new FormData();
+  form.append('receipt_image', {
+    uri,
+    name: `receipt-${Date.now()}.jpg`,
+    type: 'image/jpeg',
+  } as unknown as Blob);
+
+  const response = await apiClient.post<
+    ApiEnvelope<{
+      receipt_image_path: string;
+      raw_text: string;
+      total_price: number | null;
+      confidence: number;
+    }>
+  >('/ocr/scan', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+  return response.data.data;
+}

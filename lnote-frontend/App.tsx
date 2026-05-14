@@ -8,6 +8,8 @@ import LoginScreen from './src/screens/LoginScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import TransactionDetailScreen from './src/screens/TransactionDetailScreen';
+import OcrCameraScreen from './src/screens/OcrCameraScreen';
+import OcrReviewScreen from './src/screens/OcrReviewScreen';
 import { me, logout } from './src/services/api/authService';
 import { setUnauthorizedHandler } from './src/services/api/client';
 import { User } from './src/types/domain';
@@ -18,6 +20,8 @@ type RootStackParamList = {
   AddTransaction: undefined;
   History: undefined;
   TransactionDetail: { id: number };
+  OcrCamera: undefined;
+  OcrReview: { imageUri: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -75,6 +79,8 @@ export default function App() {
             )}
           </Stack.Screen>
           <Stack.Screen name="AddTransaction" component={AddTransactionScreen} options={{ title: 'Add Transaction' }} />
+          <Stack.Screen name="OcrCamera" component={OcrCameraScreen} options={{ title: 'Scan Receipt' }} />
+          <Stack.Screen name="OcrReview" component={OcrReviewScreen} options={{ title: 'OCR Review' }} />
           <Stack.Screen name="History">
             {({ navigation }) => (
               <HistoryScreen onOpenDetail={(id) => navigation.navigate('TransactionDetail', { id })} />

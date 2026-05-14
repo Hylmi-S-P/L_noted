@@ -7,10 +7,17 @@ import { Customer, ServicePrice } from '../types/domain';
 type Props = {
   navigation: {
     goBack: () => void;
+    navigate: (screen: 'OcrCamera') => void;
+  };
+  route?: {
+    params?: {
+      ocrTotal?: number | null;
+      ocrRawText?: string;
+    };
   };
 };
 
-export default function AddTransactionScreen({ navigation }: Props) {
+export default function AddTransactionScreen({ navigation, route }: Props) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [services, setServices] = useState<ServicePrice[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
@@ -23,6 +30,15 @@ export default function AddTransactionScreen({ navigation }: Props) {
     getCustomers().then(setCustomers).catch(() => setCustomers([]));
     getServicePrices().then(setServices).catch(() => setServices([]));
   }, []);
+
+  useEffect(() => {
+    const ocrTotal = route?.params?.ocrTotal;
+    const ocrRawText = route?.params?.ocrRawText;
+    if (ocrTotal || ocrRawText) {
+      const nextNote = `OCR Total: ${ocrTotal ?? '-'}\n${ocrRawText ?? ''}`.trim();
+      setNotes(nextNote);
+    }
+  }, [route?.params?.ocrRawText, route?.params?.ocrTotal]);
 
   const computeTotal = () => {
     const svc = services.find((s) => s.id === selectedService);
@@ -56,6 +72,9 @@ export default function AddTransactionScreen({ navigation }: Props) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.heading}>Tambah Transaksi</Text>
+      <TouchableOpacity style={styles.ocrButton} onPress={() => navigation.navigate('OcrCamera')}>
+        <Text style={styles.ocrButtonText}>Scan Receipt (OCR)</Text>
+      </TouchableOpacity>
 
       <Text style={styles.label}>Pelanggan</Text>
       <View style={styles.listContainer}>
@@ -117,4 +136,15 @@ const styles = StyleSheet.create({
   total: { fontSize: 18, fontWeight: '700', marginTop: 16, marginBottom: 12 },
   primaryButton: { height: 56, borderRadius: 12, backgroundColor: '#00595c', alignItems: 'center', justifyContent: 'center' },
   primaryButtonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  ocrButton: {
+    height: 48,
+    borderRadius: 10,
+    backgroundColor: '#ecfeff',
+    borderWidth: 1,
+    borderColor: '#67e8f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  ocrButtonText: { color: '#0f766e', fontWeight: '700' },
 });

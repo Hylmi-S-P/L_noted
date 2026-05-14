@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\OcrController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Models\ServicePrice;
 
@@ -26,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('transactions', TransactionController::class);
     Route::patch('transactions/{id}/status', [TransactionController::class, 'updateStatus']);
     Route::patch('transactions/{id}/payment', [TransactionController::class, 'updatePayment']);
+    Route::post('ocr/scan', [OcrController::class, 'scan'])->middleware('throttle:20,1');
 
     Route::get('service-prices', function () {
         return response()->json([
