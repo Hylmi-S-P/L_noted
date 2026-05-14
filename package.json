@@ -1,0 +1,12 @@
+{
+  "name": "lnote-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node prod-server.js",
+    "start:prod": "node prod-server.js"
+  },
+  "devDependencies": {
+    "sigmap": "^6.10.10"
+  }
+}

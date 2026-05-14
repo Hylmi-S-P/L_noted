@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L-Note - Foto Nota</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#6f3814",
+                        "primary-container": "#0d7377",
+                        "primary-fixed": "#9df0f4",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d7dbda",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#181c1c",
+                        "tertiary-container": "#975731",
+                        "tertiary-fixed": "#ffdbca",
+                        "inverse-primary": "#81d4d8",
+                        "secondary-fixed": "#7dfba4",
+                        "surface-container": "#ebeeee",
+                        "on-error-container": "#93000a",
+                        "surface": "#f7fafa",
+                        "on-primary-container": "#a2f5f9",
+                        "tertiary": "#7a401c",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#006d37",
+                        "tertiary-fixed-dim": "#ffb68e",
+                        "on-surface-variant": "#3e4949",
+                        "surface-container-highest": "#e0e3e3",
+                        "primary": "#00595c",
+                        "on-secondary-fixed": "#00210c",
+                        "inverse-on-surface": "#eef1f1",
+                        "outline": "#6e7979",
+                        "on-secondary-fixed-variant": "#005228",
+                        "background": "#f7fafa",
+                        "surface-tint": "#00696d",
+                        "primary-fixed-dim": "#81d4d8",
+                        "surface-bright": "#f7fafa",
+                        "on-tertiary-container": "#ffe1d2",
+                        "on-primary-fixed-variant": "#004f52",
+                        "inverse-surface": "#2d3131",
+                        "secondary-fixed-dim": "#5fde8a",
+                        "on-background": "#181c1c",
+                        "outline-variant": "#bec9c9",
+                        "surface-container-low": "#f1f4f4",
+                        "on-primary-fixed": "#002021",
+                        "on-secondary-container": "#00723a",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#7af8a2",
+                        "surface-container-high": "#e5e9e8",
+                        "surface-variant": "#e0e3e3",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#331200"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "stack-sm": "12px",
+                        "base": "8px",
+                        "stack-md": "24px",
+                        "stack-lg": "40px",
+                        "container-margin": "20px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "button-text": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.5px", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "button-text": ["16px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-black text-on-primary h-screen w-screen overflow-hidden flex flex-col font-body-md text-body-md relative">
+<!-- Camera Viewfinder Background -->
+<div class="absolute inset-0 z-0 bg-cover bg-center" data-alt="A close-up view of a slightly crumpled white paper receipt resting on a dark wooden table. The lighting is bright and focused, simulating a smartphone camera viewfinder. The receipt has indistinct black printed text, suggesting a transaction. The background is slightly out of focus, emphasizing the receipt in the foreground." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAwE0wJv2apibX83M8Bj_Z0-nhZa-luFDNGsxsfmnCAuNUPNMqx5Hi5MhEozYEynKWBHl4cd9MqxLsieqIdu14EqGuEIE7_XLJcxHqeaaexWFCsZ0mKfHSvDnwCk9ahpbvwApzCxkEGW9_6pch_XyP0S3Ogm16xdO8f7ivFLr1KSmR-vQhAcHpUJyvgMUz7PoBkIyfnGE-lOQ6LTpkUf4Qv3PsknS7Zul3PC_7Z-2XUx-MCXjT_xZqTDXaIcZKgFiNGcSgAEdE-J63G');">
+</div>
+<!-- Top Navigation Bar -->
+<div class="relative z-20 flex justify-between items-center w-full px-container-margin h-16 pt-4">
+<button aria-label="Kembali" class="w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 transition-colors">
+<span class="material-symbols-outlined text-on-primary" data-icon="arrow_back">arrow_back</span>
+</button>
+<button aria-label="Flash" class="w-12 h-12 flex items-center justify-center rounded-full bg-black/40 hover:bg-black/60 transition-colors">
+<span class="material-symbols-outlined text-on-primary" data-icon="flash_on">flash_on</span>
+</button>
+</div>
+<!-- Semi-transparent Overlay with Cutout -->
+<div class="absolute inset-0 z-10 pointer-events-none flex flex-col">
+<!-- Top Overlay -->
+<div class="flex-1 bg-black/60 w-full"></div>
+<!-- Center Row with Guide Frame -->
+<div class="flex w-full">
+<div class="w-container-margin bg-black/60"></div>
+<!-- The Clear Guide Frame -->
+<div class="flex-1 relative aspect-[3/4] border-2 border-primary-fixed rounded-xl flex flex-col items-center justify-center">
+<!-- Frame Corners for Visual Anchor -->
+<div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary-fixed rounded-tl-xl -m-1"></div>
+<div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary-fixed rounded-tr-xl -m-1"></div>
+<div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary-fixed rounded-bl-xl -m-1"></div>
+<div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary-fixed rounded-br-xl -m-1"></div>
+</div>
+<div class="w-container-margin bg-black/60"></div>
+</div>
+<!-- Bottom Overlay -->
+<div class="flex-[1.5] bg-black/60 w-full flex flex-col items-center pt-stack-md px-container-margin text-center">
+<p class="font-headline-md text-headline-md text-on-primary mb-stack-sm drop-shadow-md">Arahkan nota ke dalam kotak</p>
+<div class="bg-error-container/20 px-4 py-2 rounded-full border border-error/50 backdrop-blur-sm">
+<p class="font-body-md text-body-md text-error-container flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="warning">warning</span>
+                    Pastikan angka TOTAL terlihat jelas
+                </p>
+</div>
+</div>
+</div>
+<!-- Bottom Controls -->
+<div class="relative z-20 mt-auto pb-stack-lg flex justify-center items-end h-40">
+<!-- Capture Button -->
+<button aria-label="Ambil Foto" class="w-[88px] h-[88px] rounded-full bg-white/30 border-4 border-white flex items-center justify-center hover:bg-white/50 active:scale-95 transition-all duration-200">
+<div class="w-16 h-16 rounded-full bg-white shadow-md"></div>
+</button>
+</div>
+</body></html>

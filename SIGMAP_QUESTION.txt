@@ -1,0 +1,1 @@
+Which files and configuration relate to SigMap and the available skills in this repository? Please rank files by relevance and include a short summary for each.

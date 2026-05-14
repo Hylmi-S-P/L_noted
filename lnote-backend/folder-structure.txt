@@ -1,0 +1,163 @@
+lnote-backend/
+├── app/
+│   ├── Models/
+│   │   ├── User.php                     # Laundry owner
+│   │   ├── Customer.php                 # Customer record
+│   │   ├── Transaction.php              # Laundry order
+│   │   └── ServicePrice.php             # Service pricing
+│   │
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Api/
+│   │   │   │   ├── AuthController.php        # Login/logout
+│   │   │   │   ├── TransactionController.php # CRUD transactions
+│   │   │   │   ├── CustomerController.php    # CRUD customers
+│   │   │   │   ├── OCRController.php         # OCR upload & processing
+│   │   │   │   ├── ReportController.php      # Daily/summary reports
+│   │   │   │   └── ServicePriceController.php
+│   │   │   └── Controller.php                # Base controller
+│   │   │
+│   │   ├── Middleware/
+│   │   │   ├── Authenticate.php
+│   │   │   ├── TrustProxies.php
+│   │   │   ├── RateLimitOCR.php         # Rate limit OCR endpoint
+│   │   │   └── ValidateSignature.php
+│   │   │
+│   │   ├── Requests/
+│   │   │   ├── LoginRequest.php
+│   │   │   ├── StoreTransactionRequest.php
+│   │   │   ├── UpdateTransactionRequest.php
+│   │   │   ├── StoreCustomerRequest.php
+│   │   │   ├── OCRUploadRequest.php
+│   │   │   └── UpdateTransactionStatusRequest.php
+│   │   │
+│   │   └── Resources/
+│   │       ├── TransactionResource.php  # API response formatting
+│   │       ├── CustomerResource.php
+│   │       ├── UserResource.php
+│   │       └── ReportResource.php
+│   │
+│   ├── Services/
+│   │   ├── OCRService.php               # Google Vision API integration
+│   │   ├── ReportService.php            # Report generation & aggregation
+│   │   ├── ImageService.php             # Image compression & storage
+│   │   ├── NotificationService.php      # Firebase FCM notifications
+│   │   ├── TransactionService.php       # Transaction business logic
+│   │   └── AuthService.php              # Auth & token management
+│   │
+│   ├── Policies/
+│   │   ├── TransactionPolicy.php        # Authorization for transactions
+│   │   └── CustomerPolicy.php           # Authorization for customers
+│   │
+│   └── Events/
+│       ├── TransactionCreated.php
+│       ├── TransactionStatusChanged.php
+│       └── PaymentReceived.php
+│
+├── database/
+│   ├── migrations/
+│   │   ├── 2024_01_01_000001_create_users_table.php
+│   │   ├── 2024_01_01_000002_create_customers_table.php
+│   │   ├── 2024_01_01_000003_create_service_prices_table.php
+│   │   ├── 2024_01_01_000004_create_transactions_table.php
+│   │   ├── 2024_01_01_000005_create_personal_access_tokens_table.php
+│   │   └── ...
+│   │
+│   ├── seeders/
+│   │   ├── DatabaseSeeder.php
+│   │   ├── UserSeeder.php              # Demo user (admin)
+│   │   ├── ServicePriceSeeder.php      # Default service prices
+│   │   ├── CustomerSeeder.php          # Demo customers
+│   │   └── TransactionSeeder.php       # Demo transactions
+│   │
+│   └── factories/
+│       ├── UserFactory.php
+│       ├── CustomerFactory.php
+│       ├── TransactionFactory.php
+│       └── ServicePriceFactory.php
+│
+├── routes/
+│   ├── api.php                         # API routes (all API endpoints here)
+│   ├── web.php                         # Web routes (if admin dashboard needed)
+│   └── console.php                     # Console/CLI routes
+│
+├── tests/
+│   ├── Feature/
+│   │   ├── AuthTest.php                # Auth endpoints test
+│   │   ├── TransactionTest.php         # Transaction endpoints test
+│   │   ├── OCRTest.php                 # OCR processing test
+│   │   └── ReportTest.php              # Report generation test
+│   │
+│   ├── Unit/
+│   │   ├── Services/
+│   │   │   ├── OCRServiceTest.php
+│   │   │   ├── ReportServiceTest.php
+│   │   │   └── ImageServiceTest.php
+│   │   └── Models/
+│   │       ├── TransactionTest.php
+│   │       └── CustomerTest.php
+│   │
+│   ├── TestCase.php                   # Base test class
+│   └── CreatesApplication.php
+│
+├── storage/
+│   ├── app/
+│   │   ├── nota/                       # Receipt images organized by year/month
+│   │   │   ├── 2025/
+│   │   │   │   ├── 01/
+│   │   │   │   │   ├── txn_001_1720345678.jpg
+│   │   │   │   │   └── txn_002_1720345999.jpg
+│   │   │   │   └── 02/
+│   │   │   └── 2026/
+│   │   ├── avatars/                    # User profile pictures
+│   │   └── .gitkeep
+│   ├── logs/
+│   │   └── laravel.log
+│   ├── cache/
+│   │   └── .gitkeep
+│   └── uploads/
+│       └── .gitkeep
+│
+├── public/
+│   ├── index.php                       # Entry point
+│   ├── .htaccess
+│   ├── web.config
+│   ├── uploads/                        # Symlink to storage/uploads
+│   └── storage/                        # Symlink to storage/app/public
+│
+├── config/
+│   ├── app.php                         # App configuration
+│   ├── database.php                    # Database config
+│   ├── filesystems.php                 # Storage configuration
+│   ├── services.php                    # Service configurations
+│   ├── cors.php                        # CORS settings
+│   ├── auth.php                        # Auth settings
+│   ├── cache.php
+│   ├── logging.php
+│   ├── queue.php
+│   ├── session.php
+│   └── sanctum.php                     # Sanctum (API auth)
+│
+├── .github/
+│   └── workflows/
+│       ├── test.yml                    # Run tests on push
+│       ├── deploy.yml                  # Deploy to VPS on release
+│       └── code-quality.yml            # Code quality checks
+│
+├── docs/
+│   ├── API.md                          # API documentation
+│   ├── DATABASE.md                     # Database schema details
+│   ├── DEPLOYMENT.md                   # VPS deployment guide
+│   ├── OCR.md                          # OCR integration guide
+│   ├── SECURITY.md                     # Security checklist
+│   └── SETUP.md                        # Initial setup guide
+│
+├── .env.example                        # Environment template
+├── .gitignore
+├── artisan                             # Laravel CLI
+├── composer.json                       # PHP dependencies
+├── composer.lock
+├── phpunit.xml                         # PHPUnit configuration
+├── pint.json                           # Code formatting config
+├── README.md
+└── server.php                          # Built-in server support

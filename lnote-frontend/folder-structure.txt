@@ -1,0 +1,150 @@
+lnote-frontend/
+├── src/
+│   ├── screens/
+│   │   ├── Auth/
+│   │   │   ├── LoginScreen.tsx
+│   │   │   ├── SplashScreen.tsx
+│   │   │   └── index.ts
+│   │   ├── Dashboard/
+│   │   │   ├── DashboardScreen.tsx
+│   │   │   ├── DashboardSummary.tsx
+│   │   │   ├── ActiveTransactionsList.tsx
+│   │   │   └── index.ts
+│   │   ├── Transaction/
+│   │   │   ├── TransactionDetailScreen.tsx
+│   │   │   ├── AddTransactionBottomSheet.tsx
+│   │   │   ├── UpdateStatusModal.tsx
+│   │   │   └── index.ts
+│   │   ├── OCR/
+│   │   │   ├── CameraScreen.tsx
+│   │   │   ├── OCRReviewScreen.tsx
+│   │   │   ├── OCRResult.tsx
+│   │   │   └── index.ts
+│   │   ├── History/
+│   │   │   ├── HistoryScreen.tsx
+│   │   │   ├── TransactionList.tsx
+│   │   │   ├── FilterChips.tsx
+│   │   │   └── index.ts
+│   │   └── Settings/
+│   │       ├── SettingsScreen.tsx
+│   │       ├── ProfileSection.tsx
+│   │       └── index.ts
+│   │
+│   ├── navigation/
+│   │   ├── RootNavigator.tsx
+│   │   ├── AuthNavigator.tsx
+│   │   ├── AppNavigator.tsx
+│   │   ├── LinkingConfiguration.ts
+│   │   └── types.ts
+│   │
+│   ├── components/
+│   │   ├── UI/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── Input.tsx
+│   │   │   ├── Badge.tsx
+│   │   │   ├── Chip.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   ├── LoadingSpinner.tsx
+│   │   │   ├── EmptyState.tsx
+│   │   │   └── index.ts
+│   │   ├── Forms/
+│   │   │   ├── TransactionForm.tsx
+│   │   │   ├── CustomerAutocomplete.tsx
+│   │   │   ├── ServiceTypeSelector.tsx
+│   │   │   └── index.ts
+│   │   ├── Navigation/
+│   │   │   ├── BottomTabNavigator.tsx
+│   │   │   ├── StackHeader.tsx
+│   │   │   └── index.ts
+│   │   └── Common/
+│   │       ├── Toast.tsx
+│   │       ├── ConfirmDialog.tsx
+│   │       ├── ImagePreview.tsx
+│   │       ├── DateRangePicker.tsx
+│   │       └── index.ts
+│   │
+│   ├── services/
+│   │   ├── api/
+│   │   │   ├── client.ts               # Axios instance with interceptors
+│   │   │   ├── endpoints.ts            # API endpoint URLs
+│   │   │   ├── authApi.ts              # Auth endpoints
+│   │   │   ├── transactionApi.ts       # Transaction endpoints
+│   │   │   ├── ocrApi.ts               # OCR endpoints
+│   │   │   ├── reportApi.ts            # Report endpoints
+│   │   │   └── index.ts
+│   │   ├── storage/
+│   │   │   ├── secureStore.ts          # Token storage (SecureStore)
+│   │   │   ├── asyncStorage.ts         # User preferences (AsyncStorage)
+│   │   │   ├── imageCache.ts           # Image caching
+│   │   │   └── index.ts
+│   │   ├── notification/
+│   │   │   ├── fcmService.ts           # Firebase Cloud Messaging
+│   │   │   ├── notificationHandler.ts  # Handle incoming notifications
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.ts                  # Authentication hook
+│   │   ├── useTransactions.ts          # Transaction CRUD operations
+│   │   ├── useOCR.ts                   # OCR scanning hook
+│   │   ├── useFetch.ts                 # Generic data fetching
+│   │   ├── useStorage.ts               # Local storage operations
+│   │   └── index.ts
+│   │
+│   ├── context/
+│   │   ├── AuthContext.tsx             # Auth state & providers
+│   │   ├── ThemeContext.tsx            # Theme (dark/light mode)
+│   │   ├── SettingsContext.tsx         # App settings
+│   │   └── index.ts
+│   │
+│   ├── utils/
+│   │   ├── formatting.ts               # Date, currency formatting
+│   │   ├── validation.ts               # Form validation
+│   │   ├── imageCompression.ts         # Image compression for OCR
+│   │   ├── errorHandler.ts             # Error handling & messages
+│   │   ├── permissions.ts              # Camera, storage permissions
+│   │   ├── logger.ts                   # Logging utility
+│   │   └── index.ts
+│   │
+│   ├── constants/
+│   │   ├── colors.ts                   # Theme colors
+│   │   ├── fonts.ts                    # Font sizes & families
+│   │   ├── spacing.ts                  # Margin & padding constants
+│   │   ├── messages.ts                 # Error & success messages
+│   │   ├── transactionStatus.ts        # Status enums & labels
+│   │   └── index.ts
+│   │
+│   ├── assets/
+│   │   ├── images/
+│   │   │   ├── splash.png
+│   │   │   ├── logo.png
+│   │   │   ├── placeholder.png
+│   │   │   └── ...
+│   │   ├── icons/
+│   │   │   ├── CameraIcon.svg
+│   │   │   ├── HomeIcon.svg
+│   │   │   ├── HistoryIcon.svg
+│   │   │   ├── SettingsIcon.svg
+│   │   │   └── ...
+│   │   └── fonts/
+│   │       ├── Poppins-Regular.ttf
+│   │       └── ...
+│   │
+│   └── App.tsx                          # Main app entry point
+│
+├── .github/
+│   └── workflows/
+│       ├── test.yml
+│       └── build.yml
+│
+├── .gitignore
+├── app.json                            # Expo configuration
+├── app.config.js                       # Expo config (if using JS)
+├── eas.json                            # EAS Build configuration
+├── babel.config.js
+├── tsconfig.json
+├── package.json
+├── package-lock.json
+├── .env.example
+└── README.md

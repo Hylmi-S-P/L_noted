@@ -1,0 +1,17 @@
+{
+  "srcDirs": [
+    "lnote-backend",
+    "lnote-frontend",
+    ".agents/skills"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".git",
+    ".context"
+  ],
+  "maxTokens": 100000,
+  "strategy": "per-module",
+  "tracking": false,
+  "minCoverage": 0.7
+}
