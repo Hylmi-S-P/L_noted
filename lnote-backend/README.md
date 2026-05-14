@@ -156,11 +156,29 @@ CACHE_DRIVER=file
 
 ## 📋 API Endpoints
 
+### Response Envelope
+All API responses use:
+```json
+{
+  "success": true,
+  "message": "Human readable message",
+  "data": {},
+  "errors": null
+}
+```
+
 ### Authentication
 ```
 POST   /api/auth/login           # Login
 POST   /api/auth/logout          # Logout
 GET    /api/auth/me              # Current user
+```
+Login request body:
+```json
+{
+  "email": "test@example.com",
+  "password": "password"
+}
 ```
 
 ### Transactions
@@ -173,6 +191,8 @@ DELETE /api/transactions/{id}     # Delete
 PATCH  /api/transactions/{id}/status        # Update status
 PATCH  /api/transactions/{id}/payment       # Update payment status
 ```
+Status values: `pending`, `proses`, `selesai`, `diambil`  
+Payment values: `belum_lunas`, `lunas`
 
 ### Customers
 ```

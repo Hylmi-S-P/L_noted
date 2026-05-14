@@ -3,33 +3,30 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Transaction\StoreTransactionRequest;
+use App\Http\Requests\Transaction\UpdateTransactionPaymentRequest;
+use App\Http\Requests\Transaction\UpdateTransactionRequest;
+use App\Http\Requests\Transaction\UpdateTransactionStatusRequest;
 use App\Models\Transaction;
 use App\Models\ServicePrice;
-use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
     public function index()
     {
-        return response()->json(Transaction::with(['customer','servicePrice','user'])->get());
+        $transactions = Transaction::with(['customer', 'servicePrice', 'user'])->latest()->get();
+        return $this->successResponse($transactions, 'Transactions fetched.');
     }
 
-    public function store(Request $request)
+    public function store(StoreTransactionRequest $request)
     {
-        $data = $request->validate([
-            'customer_id' => 'required|integer|exists:customers,id',
-            'service_price_id' => 'required|integer|exists:service_prices,id',
-            'quantity' => 'required|numeric|min:0.1',
-            'notes' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
-        // Compute amount server-side to avoid manipulation from client
         $service = ServicePrice::findOrFail($data['service_price_id']);
-        // For simplicity: assume price is per unit (kg or unit). Quantity multiplies price.
-        $amount = (int) round($service->price * $data['quantity']);
+        $amount = (int) ($service->price * $data['quantity']);
 
         $transaction = Transaction::create([
-            'user_id' => auth()->id() ?? 1,
+            'user_id' => auth()->id(),
             'customer_id' => $data['customer_id'],
             'service_price_id' => $data['service_price_id'],
             'quantity' => $data['quantity'],
@@ -37,33 +34,45 @@ class TransactionController extends Controller
             'status' => 'proses',
             'payment_status' => 'belum_lunas',
             'notes' => $data['notes'] ?? null,
+            'due_date' => $data['due_date'] ?? null,
         ]);
 
-        return response()->json($transaction->load(['customer','servicePrice']), 201);
+        return $this->successResponse($transaction->load(['customer', 'servicePrice', 'user']), 'Transaction created.', 201);
     }
 
     public function show($id)
     {
-        return response()->json(Transaction::with(['customer','servicePrice','user'])->findOrFail($id));
+        $transaction = Transaction::with(['customer', 'servicePrice', 'user'])->findOrFail($id);
+        return $this->successResponse($transaction, 'Transaction fetched.');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateTransactionRequest $request, $id)
     {
         $txn = Transaction::findOrFail($id);
-        $data = $request->validate([
-            'status' => 'nullable|string',
-            'payment_status' => 'nullable|string',
-            'notes' => 'nullable|string',
-        ]);
-
-        $txn->update($data);
-        return response()->json($txn);
+        $txn->update($request->validated());
+        return $this->successResponse($txn->fresh(['customer', 'servicePrice', 'user']), 'Transaction updated.');
     }
 
     public function destroy($id)
     {
         $txn = Transaction::findOrFail($id);
         $txn->delete();
-        return response()->json(null, 204);
+        return $this->successResponse(null, 'Transaction deleted.');
+    }
+
+    public function updateStatus(UpdateTransactionStatusRequest $request, $id)
+    {
+        $txn = Transaction::findOrFail($id);
+        $txn->update($request->validated());
+
+        return $this->successResponse($txn->fresh(['customer', 'servicePrice', 'user']), 'Transaction status updated.');
+    }
+
+    public function updatePayment(UpdateTransactionPaymentRequest $request, $id)
+    {
+        $txn = Transaction::findOrFail($id);
+        $txn->update($request->validated());
+
+        return $this->successResponse($txn->fresh(['customer', 'servicePrice', 'user']), 'Transaction payment updated.');
     }
 }
