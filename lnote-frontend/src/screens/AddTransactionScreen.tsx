@@ -1,26 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, Platform } from 'react-native';
-import axios from 'axios';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
+import { getCustomers } from '../services/api/customerService';
+import { createTransaction, getServicePrices } from '../services/api/transactionService';
+import { Customer, ServicePrice } from '../types/domain';
 
-const API_HOST = Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://127.0.0.1:8000';
+type Props = {
+  navigation: {
+    goBack: () => void;
+  };
+};
 
-export default function AddTransactionScreen({ navigation }: any) {
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [services, setServices] = useState<any[]>([]);
+export default function AddTransactionScreen({ navigation }: Props) {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [services, setServices] = useState<ServicePrice[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [quantity, setQuantity] = useState('1');
+  const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    axios.get(`${API_HOST}/api/customers`).then((r) => setCustomers(r.data)).catch(() => setCustomers([]));
-    axios.get(`${API_HOST}/api/service-prices`).then((r) => setServices(r.data)).catch(() => setServices([]));
+    getCustomers().then(setCustomers).catch(() => setCustomers([]));
+    getServicePrices().then(setServices).catch(() => setServices([]));
   }, []);
 
   const computeTotal = () => {
     const svc = services.find((s) => s.id === selectedService);
     if (!svc) return 0;
-    const qty = parseFloat(quantity) || 0;
+    const qty = parseInt(quantity, 10) || 0;
     return svc.price * qty;
   };
 
@@ -31,16 +38,16 @@ export default function AddTransactionScreen({ navigation }: any) {
     }
     setLoading(true);
     try {
-      const payload = {
+      await createTransaction({
         customer_id: selectedCustomer,
         service_price_id: selectedService,
-        quantity: parseFloat(quantity),
-      };
-      const res = await axios.post(`${API_HOST}/api/transactions`, payload);
+        quantity: parseInt(quantity, 10) || 1,
+        notes: notes || undefined,
+      });
       Alert.alert('Sukses', 'Transaksi dibuat');
       navigation.goBack();
-    } catch (err) {
-      Alert.alert('Error', 'Gagal membuat transaksi');
+    } catch {
+      Alert.alert('Error', 'Gagal membuat transaksi. Periksa data dan koneksi.');
     } finally {
       setLoading(false);
     }
@@ -85,6 +92,8 @@ export default function AddTransactionScreen({ navigation }: any) {
         keyboardType="numeric"
         style={styles.input}
       />
+      <Text style={styles.label}>Catatan (opsional)</Text>
+      <TextInput value={notes} onChangeText={setNotes} style={styles.input} />
 
       <Text style={styles.total}>Total: Rp {computeTotal().toLocaleString()}</Text>
 
