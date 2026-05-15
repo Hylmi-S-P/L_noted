@@ -14,6 +14,16 @@ sudo apt update
 sudo apt install -y nginx mysql-server php8.2 php8.2-cli php8.2-fpm php8.2-mysql php8.2-mbstring php8.2-xml php8.2-curl php8.2-zip unzip git composer
 ```
 
+Firewall minimum:
+
+```bash
+sudo apt install -y ufw
+sudo ufw allow OpenSSH
+sudo ufw allow 'Nginx Full'
+sudo ufw --force enable
+sudo ufw status
+```
+
 ## 2. Database
 
 Buat database dan user MySQL:
@@ -65,6 +75,20 @@ php artisan config:cache
 php artisan route:cache
 ```
 
+Pastikan production mode:
+
+```bash
+php artisan env
+php artisan about
+```
+
+Nilai penting di `.env`:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+```
+
 Permission:
 
 ```bash
@@ -101,6 +125,21 @@ Aktifkan:
 sudo ln -s /etc/nginx/sites-available/lnote /etc/nginx/sites-enabled/lnote
 sudo nginx -t
 sudo systemctl reload nginx
+```
+
+Jangan pakai `php artisan serve` untuk produksi. Backend production harus lewat Nginx + PHP-FPM.
+
+Jika sudah punya domain yang mengarah ke IP VPS, aktifkan HTTPS:
+
+```bash
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d domain-anda.com
+```
+
+Setelah HTTPS aktif, frontend harus memakai:
+
+```env
+EXPO_PUBLIC_API_URL=https://domain-anda.com/api
 ```
 
 ## 5. Frontend API URL
@@ -142,3 +181,27 @@ npx expo run:android
 - Tandai lunas berhasil.
 - Laporan muncul.
 - Backup database bisa dibuat.
+
+Command cek cepat di VPS:
+
+```bash
+curl http://IP_VPS/api/health
+sudo nginx -t
+sudo systemctl status php8.2-fpm
+sudo systemctl status nginx
+tail -n 100 /var/www/lnote/lnote-backend/storage/logs/laravel.log
+```
+
+Jika deploy memakai `scripts/vps-install-lnote.sh`, helper ini otomatis dibuat:
+
+```bash
+~/lnote-smoke-test.sh http://IP_VPS
+~/lnote-backup.sh
+```
+
+Jika menjalankan dari repo:
+
+```bash
+BASE_URL='http://IP_VPS' bash scripts/vps-smoke-test-lnote.sh
+DB_PASSWORD='GANTI_PASSWORD_KUAT' bash scripts/vps-backup-lnote.sh
+```

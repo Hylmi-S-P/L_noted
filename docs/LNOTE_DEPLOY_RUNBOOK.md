@@ -51,6 +51,22 @@ Jika belum clone repo dan ingin script yang clone:
 DB_PASSWORD='GANTI_PASSWORD_KUAT' SERVER_NAME='IP_VPS_ATAU_DOMAIN' REPO_URL='REPO_URL' APP_DIR='/var/www/lnote' bash scripts/vps-install-lnote.sh
 ```
 
+Default script akan:
+
+- memakai `APP_ENV=production` dan `APP_DEBUG=false`
+- membuat MySQL database/user khusus `lnote`
+- mengaktifkan Nginx + PHP-FPM
+- mengaktifkan UFW hanya untuk SSH, HTTP, HTTPS
+- membuat `~/lnote-backup.sh`
+- membuat `~/lnote-smoke-test.sh`
+
+Jika domain sudah siap dan DNS sudah mengarah ke VPS, SSL bisa langsung dipasang:
+
+```bash
+cd /var/www/lnote
+DB_PASSWORD='GANTI_PASSWORD_KUAT' SERVER_NAME='domain-anda.com' ENABLE_SSL=true bash scripts/vps-install-lnote.sh
+```
+
 ## 3. Cek API
 
 Buka di browser:
@@ -63,6 +79,12 @@ Expected:
 
 ```json
 {"success":true,"message":"API is healthy.","data":{"status":"ok"},"errors":null}
+```
+
+Atau pakai helper:
+
+```bash
+~/lnote-smoke-test.sh http://IP_VPS_ATAU_DOMAIN
 ```
 
 ## 4. Update Frontend Laptop
@@ -104,6 +126,12 @@ mysqldump -u lnote -p lnote > ~/lnote-backups/lnote-$(date +%F-%H%M).sql
 ls -lh ~/lnote-backups
 ```
 
+Atau pakai helper yang dibuat script deploy:
+
+```bash
+~/lnote-backup.sh
+```
+
 Simpan salinan backup di luar VPS secara rutin.
 
 ## 7. Jika Pakai Domain Dan SSL Nanti
@@ -122,3 +150,12 @@ EXPO_PUBLIC_API_URL=https://domain-anda.com/api
 ```
 
 Build ulang Android setelah URL berubah.
+
+## 8. Minimum Aman Yang Tidak Boleh Dilewati
+
+- `.env` production tidak boleh masuk GitHub.
+- `APP_DEBUG=false`.
+- Gunakan Nginx + PHP-FPM, bukan `php artisan serve`.
+- UFW hanya membuka `22`, `80`, `443`.
+- Backup database sebelum update.
+- OCR dan FCM tetap disabled kecuali memang akan dipakai lagi.

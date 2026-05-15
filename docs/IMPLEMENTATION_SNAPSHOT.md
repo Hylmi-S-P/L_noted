@@ -814,3 +814,53 @@ Local-only items intentionally not committed:
 - local agent/runtime folders
 - generated SigMap context changes in `.github/`
 - untracked `docs/SIGMAP_QUESTION.txt`
+
+## Latest continuation (minimum aman production stabilization, 2026-05-15 21:45 +07:00)
+
+Context:
+- User decided formal pentest is not needed for this small one-client laundry app.
+- Target is pragmatic minimum security: stable deploy, protected env, firewall, backup, and smoke testing.
+
+Scope completed:
+- Backend API hardening:
+  - added a named `login` rate limiter in `lnote-backend/app/Providers/AppServiceProvider.php`
+  - applied `throttle:login` to `POST /api/auth/login`
+  - limit is 5 login attempts per minute per email/IP key
+- VPS deployment script hardened:
+  - `scripts/vps-install-lnote.sh` now supports `ENABLE_FIREWALL=true` by default
+  - UFW opens only OpenSSH and Nginx Full
+  - optional `ENABLE_SSL=true` path installs Certbot when `SERVER_NAME` is a real domain
+  - deploy now creates `~/lnote-backup.sh`
+  - deploy now creates `~/lnote-smoke-test.sh`
+- Added reusable VPS helper scripts:
+  - `scripts/vps-backup-lnote.sh`
+  - `scripts/vps-smoke-test-lnote.sh`
+- Backup handling improved:
+  - backup scripts use a temporary MySQL option file instead of exposing the DB password via `mysqldump -p...` process arguments
+  - backup output is stored under `~/lnote-backups` with restricted file permission
+- Documentation updated:
+  - `docs/VPS_DEPLOYMENT_CHECKLIST.md`
+  - `docs/DATABASE_BACKUP_GUIDE.md`
+  - `docs/LNOTE_DEPLOY_RUNBOOK.md`
+
+Validation:
+- Backend auth tests passed with existing PDO deprecation warnings only:
+  - `php artisan test --filter=AuthApiTest`
+- Route cache compatibility checked and passed:
+  - `php artisan route:cache`
+  - then cleared again for local development with `php artisan route:clear`
+- Demo data reseeded after backend tests:
+  - `php artisan db:seed`
+- Shell syntax checked using Git for Windows `sh.exe -n` because Windows WSL bash launcher is installed but no Linux `/bin/bash` is available:
+  - `scripts/vps-install-lnote.sh`
+  - `scripts/vps-backup-lnote.sh`
+  - `scripts/vps-smoke-test-lnote.sh`
+
+Production notes:
+- Production should use Nginx + PHP-FPM, not `php artisan serve`.
+- Keep `APP_ENV=production` and `APP_DEBUG=false` on VPS.
+- Keep frontend flags disabled for this deployment:
+  - `EXPO_PUBLIC_ENABLE_PUSH=false`
+  - `EXPO_PUBLIC_ENABLE_OCR=false`
+- If using an IP only, use HTTP for first deploy.
+- If using a real domain, enable HTTPS and rebuild the Android app with the HTTPS API URL.

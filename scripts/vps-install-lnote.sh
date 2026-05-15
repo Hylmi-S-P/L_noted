@@ -11,6 +11,8 @@ set -euo pipefail
 #   APP_DIR='/var/www/lnote-backend'
 #   SERVER_NAME='your-domain.com'   # Use VPS IP if domain is not ready.
 #   REPO_URL='https://github.com/your/repo.git'
+#   ENABLE_FIREWALL='true'           # Opens only SSH, HTTP, HTTPS through UFW.
+#   ENABLE_SSL='false'               # Set true only when SERVER_NAME is a real domain.
 #
 # Example:
 #   DB_PASSWORD='change-me' SERVER_NAME='203.0.113.10' REPO_URL='https://github.com/Hylmi-S-P/L_noted.git' bash scripts/vps-install-lnote.sh
@@ -20,6 +22,8 @@ SERVER_NAME="${SERVER_NAME:-_}"
 DB_NAME="${DB_NAME:-lnote}"
 DB_USER="${DB_USER:-lnote}"
 PHP_VERSION="${PHP_VERSION:-8.2}"
+ENABLE_FIREWALL="${ENABLE_FIREWALL:-true}"
+ENABLE_SSL="${ENABLE_SSL:-false}"
 
 if [[ -z "${DB_PASSWORD:-}" ]]; then
   echo "DB_PASSWORD is required."
@@ -35,6 +39,14 @@ sudo apt install -y nginx mysql-server \
   "php${PHP_VERSION}" "php${PHP_VERSION}-cli" "php${PHP_VERSION}-fpm" "php${PHP_VERSION}-mysql" \
   "php${PHP_VERSION}-mbstring" "php${PHP_VERSION}-xml" "php${PHP_VERSION}-curl" "php${PHP_VERSION}-zip" \
   "php${PHP_VERSION}-bcmath" composer
+
+if [[ "${ENABLE_FIREWALL}" == "true" ]]; then
+  echo "Configuring UFW firewall..."
+  sudo apt install -y ufw
+  sudo ufw allow OpenSSH
+  sudo ufw allow 'Nginx Full'
+  sudo ufw --force enable
+fi
 
 echo "Creating database and user..."
 sudo mysql <<SQL
@@ -146,6 +158,54 @@ sudo systemctl reload nginx
 echo "Creating backup folder..."
 mkdir -p "${HOME}/lnote-backups"
 
+echo "Writing backup helper..."
+cat > "${HOME}/lnote-backup.sh" <<BACKUP
+#!/usr/bin/env bash
+set -euo pipefail
+mkdir -p "\${HOME}/lnote-backups"
+tmp_config="\$(mktemp)"
+chmod 600 "\${tmp_config}"
+cat > "\${tmp_config}" <<MYSQL
+[client]
+user=${DB_USER}
+password=${DB_PASSWORD}
+MYSQL
+trap 'rm -f "\${tmp_config}"' EXIT
+mysqldump --defaults-extra-file="\${tmp_config}" "${DB_NAME}" > "\${HOME}/lnote-backups/lnote-\$(date +%F-%H%M).sql"
+ls -lh "\${HOME}/lnote-backups" | tail
+BACKUP
+chmod 700 "${HOME}/lnote-backup.sh"
+
+echo "Writing smoke-test helper..."
+cat > "${HOME}/lnote-smoke-test.sh" <<SMOKE
+#!/usr/bin/env bash
+set -euo pipefail
+BASE_URL="\${1:-http://${SERVER_NAME}}"
+curl -fsS "\${BASE_URL}/api/health"
+echo
+sudo nginx -t
+systemctl is-active --quiet "php${PHP_VERSION}-fpm"
+systemctl is-active --quiet nginx
+echo "L-Note smoke test passed for \${BASE_URL}"
+SMOKE
+chmod 700 "${HOME}/lnote-smoke-test.sh"
+
+if [[ "${ENABLE_SSL}" == "true" ]]; then
+  if [[ "${SERVER_NAME}" == "_" || "${SERVER_NAME}" =~ ^[0-9.]+$ ]]; then
+    echo "ENABLE_SSL=true requires SERVER_NAME to be a real domain, not '_' or an IP."
+    exit 1
+  fi
+
+  echo "Installing HTTPS certificate with Certbot..."
+  sudo apt install -y certbot python3-certbot-nginx
+  sudo certbot --nginx -d "${SERVER_NAME}" --non-interactive --agree-tos --redirect -m "admin@${SERVER_NAME}" || {
+    echo "Certbot failed. Check DNS points to this VPS, then rerun certbot manually."
+    exit 1
+  }
+fi
+
 echo "Deployment complete."
 echo "Check: http://${SERVER_NAME}/api/health"
 echo "If SERVER_NAME is '_', use your VPS IP in the browser."
+echo "Backup helper: ${HOME}/lnote-backup.sh"
+echo "Smoke test helper: ${HOME}/lnote-smoke-test.sh http://${SERVER_NAME}"
