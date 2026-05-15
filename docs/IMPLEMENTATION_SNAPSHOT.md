@@ -795,3 +795,22 @@ Next deployment steps:
 - Verify `http://IP_VPS/api/health`.
 - Update `lnote-frontend/.env` to `EXPO_PUBLIC_API_URL=http://IP_VPS/api`.
 - Rebuild Android app.
+
+## Git handover (2026-05-15 21:20 +07:00)
+
+Repository status:
+- Deployment-ready implementation was committed on `feature/transactions-filter-v1`:
+  - `9fa7792 feat: prepare l-note for production deployment`
+- Feature branch was pushed to GitHub:
+  - `origin/feature/transactions-filter-v1`
+- Feature branch was merged into `main` with merge commit:
+  - `5a03f5f merge: production-ready l-note deployment`
+- `main` was pushed to GitHub:
+  - `origin/main`
+
+Local-only items intentionally not committed:
+- Firebase service account files under `lnote-backend/storage/keys/`
+- backend serve logs
+- local agent/runtime folders
+- generated SigMap context changes in `.github/`
+- untracked `docs/SIGMAP_QUESTION.txt`
