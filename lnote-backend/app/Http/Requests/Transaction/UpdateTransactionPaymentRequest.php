@@ -14,7 +14,7 @@ class UpdateTransactionPaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_status' => ['required', 'string', 'in:belum_lunas,lunas'],
+            'payment_status' => ['required', 'in:belum_lunas,lunas,paid,unpaid,0,1,true,false'],
         ];
     }
 }

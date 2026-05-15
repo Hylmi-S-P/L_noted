@@ -14,7 +14,7 @@ class UpdateTransactionStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', 'string', 'in:pending,proses,selesai,diambil'],
+            'status' => ['required', 'string', 'in:pending,proses,selesai,diambil,process,done,taken'],
         ];
     }
 }

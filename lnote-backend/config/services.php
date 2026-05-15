@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'google_vision' => [
+        'api_key' => env('GOOGLE_VISION_API_KEY'),
+    ],
+
+    'fcm' => [
+        'project_id' => env('FCM_PROJECT_ID'),
+        'client_email' => env('FCM_CLIENT_EMAIL'),
+        'private_key' => env('FCM_PRIVATE_KEY'),
+        'service_account_json' => env('FCM_SERVICE_ACCOUNT_JSON'),
+    ],
+
 ];

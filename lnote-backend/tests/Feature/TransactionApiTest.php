@@ -29,19 +29,43 @@ class TransactionApiTest extends TestCase
     {
         $user = User::factory()->create();
         $customer = Customer::factory()->create();
-        $service = ServicePrice::factory()->create(['price' => 12000]);
+        $service = ServicePrice::factory()->create(['price' => 12000, 'price_per_kg' => 12000]);
 
         $response = $this->withHeaders($this->authHeaderFor($user))
             ->postJson('/api/transactions', [
                 'customer_id' => $customer->id,
                 'service_price_id' => $service->id,
-                'quantity' => 3,
+                'weight_kg' => '1,5',
                 'notes' => 'Handle carefully',
             ]);
 
         $response->assertStatus(201)
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.amount', 36000)
+            ->assertJsonPath('data.amount', 18000)
+            ->assertJsonPath('data.total_price', 18000)
+            ->assertJsonPath('data.weight_kg', 1.5)
+            ->assertJsonPath('data.user_id', $user->id);
+    }
+
+    public function test_transaction_create_can_use_manual_total_price(): void
+    {
+        $user = User::factory()->create();
+        $customer = Customer::factory()->create();
+        $service = ServicePrice::factory()->create(['price' => 12000, 'price_per_kg' => 12000]);
+
+        $response = $this->withHeaders($this->authHeaderFor($user))
+            ->postJson('/api/transactions', [
+                'customer_id' => $customer->id,
+                'service_price_id' => $service->id,
+                'weight_kg' => 1.5,
+                'manual_total_price' => 26000,
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.amount', 26000)
+            ->assertJsonPath('data.total_price', 26000)
+            ->assertJsonPath('data.weight_kg', 1.5)
             ->assertJsonPath('data.user_id', $user->id);
     }
 
@@ -110,6 +134,65 @@ class TransactionApiTest extends TestCase
         $this->withHeaders($headers)
             ->patchJson('/api/transactions/'.$transaction->id.'/payment', [
                 'payment_status' => 'invalid-payment',
+            ])
+            ->assertStatus(422);
+    }
+
+    public function test_batch_payment_marks_same_customer_unpaid_transactions_paid(): void
+    {
+        $user = User::factory()->create();
+        $customer = Customer::factory()->create();
+        $first = Transaction::factory()->create([
+            'user_id' => $user->id,
+            'customer_id' => $customer->id,
+            'payment_status' => 'belum_lunas',
+            'amount' => 12000,
+            'total_price' => 12000,
+        ]);
+        $second = Transaction::factory()->create([
+            'user_id' => $user->id,
+            'customer_id' => $customer->id,
+            'payment_status' => 'belum_lunas',
+            'amount' => 18000,
+            'total_price' => 18000,
+        ]);
+
+        $this->withHeaders($this->authHeaderFor($user))
+            ->postJson('/api/transactions/batch-payment', [
+                'transaction_ids' => [$first->id, $second->id],
+                'payment_status' => 'lunas',
+            ])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.total_paid', 30000)
+            ->assertJsonPath('data.transaction_count', 2);
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $first->id,
+            'payment_status' => 'lunas',
+        ]);
+        $this->assertDatabaseHas('transactions', [
+            'id' => $second->id,
+            'payment_status' => 'lunas',
+        ]);
+    }
+
+    public function test_batch_payment_rejects_different_customers(): void
+    {
+        $user = User::factory()->create();
+        $first = Transaction::factory()->create([
+            'user_id' => $user->id,
+            'payment_status' => 'belum_lunas',
+        ]);
+        $second = Transaction::factory()->create([
+            'user_id' => $user->id,
+            'payment_status' => 'belum_lunas',
+        ]);
+
+        $this->withHeaders($this->authHeaderFor($user))
+            ->postJson('/api/transactions/batch-payment', [
+                'transaction_ids' => [$first->id, $second->id],
+                'payment_status' => 'lunas',
             ])
             ->assertStatus(422);
     }

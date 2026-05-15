@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { AxiosError } from 'axios';
 import { login } from '../services/api/authService';
 import { User } from '../types/domain';
 
@@ -14,7 +15,7 @@ export default function LoginScreen({ onLoginSuccess }: Props) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Missing fields', 'Please fill email and password.');
+      Alert.alert('Data belum lengkap', 'Isi email dan password terlebih dahulu.');
       return;
     }
 
@@ -22,8 +23,14 @@ export default function LoginScreen({ onLoginSuccess }: Props) {
     try {
       const user = await login(email.trim(), password);
       onLoginSuccess(user);
-    } catch {
-      Alert.alert('Login failed', 'Check your credentials and backend connection.');
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const message =
+        axiosError.response?.data?.message ??
+        (axiosError.request
+          ? 'Tidak bisa terhubung ke server. Cek koneksi atau nyalakan backend.'
+          : 'Periksa email dan password.');
+      Alert.alert('Login gagal', message);
     } finally {
       setLoading(false);
     }
@@ -35,7 +42,7 @@ export default function LoginScreen({ onLoginSuccess }: Props) {
       <TextInput value={email} onChangeText={setEmail} style={styles.input} placeholder="Email" autoCapitalize="none" />
       <TextInput value={password} onChangeText={setPassword} style={styles.input} placeholder="Password" secureTextEntry />
       <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
+        <Text style={styles.buttonText}>{loading ? 'Masuk...' : 'Masuk'}</Text>
       </TouchableOpacity>
     </View>
   );
