@@ -925,3 +925,24 @@ Scope completed:
 Operational note:
 - The VPS account created with `--email="sumiati"` can be used directly for login after this change is pulled/deployed.
 - App auto-login behavior is unchanged: token is stored with secure storage after first successful login.
+
+## Latest continuation (trial docs and fresh backup workflow, 2026-05-16)
+
+Scope completed:
+- Added 30-day client trial maintenance runbook:
+  - `docs/30_DAY_TRIAL_RUNBOOK.md`
+- Added APK release checklist for trial handoff:
+  - `docs/APK_RELEASE_CHECKLIST.md`
+- Updated backup guide with safe old-backup deletion and fresh-backup workflow:
+  - `docs/DATABASE_BACKUP_GUIDE.md`
+
+Operational guidance:
+- For one fresh backup on VPS:
+  - inspect files with `ls -lh ~/lnote-backups`
+  - remove old `.sql` files only from `~/lnote-backups`
+  - create fresh backup with `~/lnote-backup.sh`
+- Do not use broad destructive paths such as `rm -rf` for backup cleanup.
+
+Validation:
+- Docs-only change; backend/frontend tests not needed.
+- `sigmap validate` run after changes.

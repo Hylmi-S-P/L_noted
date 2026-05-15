@@ -35,6 +35,46 @@ Cek hasil:
 ls -lh ~/lnote-backups
 ```
 
+## Hapus Backup Lama Dan Buat Backup Fresh
+
+Gunakan ini jika ingin mulai dari satu backup yang benar-benar fresh.
+
+Lihat daftar backup dulu:
+
+```bash
+ls -lh ~/lnote-backups
+```
+
+Hapus satu file backup tertentu:
+
+```bash
+rm ~/lnote-backups/NAMA_FILE_BACKUP.sql
+```
+
+Jika yakin ingin menghapus semua backup lama:
+
+```bash
+rm ~/lnote-backups/*.sql
+```
+
+Buat backup fresh:
+
+```bash
+~/lnote-backup.sh
+```
+
+Cek hanya backup baru yang tersisa:
+
+```bash
+ls -lh ~/lnote-backups
+```
+
+Catatan aman:
+
+- Jangan hapus backup kalau belum yakin database sekarang sudah benar.
+- Sebelum menghapus semua backup lama, sebaiknya download minimal satu backup ke laptop.
+- Jangan jalankan `rm -rf` di folder lain; cukup hapus file `.sql` di `~/lnote-backups`.
+
 ## Restore Database
 
 Hati-hati: restore akan menimpa data database saat ini.
