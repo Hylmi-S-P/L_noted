@@ -907,3 +907,21 @@ Validation:
 - `php artisan lnote:prepare-client` tested locally with a temporary smoke user.
 - Local demo data was restored afterward with `php artisan db:seed`.
 - `php artisan list lnote` shows `lnote:prepare-client` registered.
+
+## Latest continuation (username-style login support, 2026-05-15)
+
+Scope completed:
+- Login now supports username-style values such as `sumiati` in addition to normal email addresses.
+- No database migration was needed; the existing `users.email` column remains the login identifier column.
+- Backend validation changed from strict email format to required string/max 255:
+  - `lnote-backend/app/Http/Requests/Auth/LoginRequest.php`
+- Frontend login copy now says `Username / Email`:
+  - `lnote-frontend/src/screens/LoginScreen.tsx`
+- Docs updated:
+  - `docs/CLIENT_USER_GUIDE.md`
+  - `docs/VPS_DEPLOYMENT_CHECKLIST.md`
+  - `docs/LNOTE_DEPLOY_RUNBOOK.md`
+
+Operational note:
+- The VPS account created with `--email="sumiati"` can be used directly for login after this change is pulled/deployed.
+- App auto-login behavior is unchanged: token is stored with secure storage after first successful login.

@@ -15,7 +15,7 @@ export default function LoginScreen({ onLoginSuccess }: Props) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Data belum lengkap', 'Isi email dan password terlebih dahulu.');
+      Alert.alert('Data belum lengkap', 'Isi username/email dan password terlebih dahulu.');
       return;
     }
 
@@ -29,7 +29,7 @@ export default function LoginScreen({ onLoginSuccess }: Props) {
         axiosError.response?.data?.message ??
         (axiosError.request
           ? 'Tidak bisa terhubung ke server. Cek koneksi atau nyalakan backend.'
-          : 'Periksa email dan password.');
+          : 'Periksa username/email dan password.');
       Alert.alert('Login gagal', message);
     } finally {
       setLoading(false);
@@ -39,7 +39,7 @@ export default function LoginScreen({ onLoginSuccess }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>L-Note Login</Text>
-      <TextInput value={email} onChangeText={setEmail} style={styles.input} placeholder="Email" autoCapitalize="none" />
+      <TextInput value={email} onChangeText={setEmail} style={styles.input} placeholder="Username / Email" autoCapitalize="none" />
       <TextInput value={password} onChangeText={setPassword} style={styles.input} placeholder="Password" secureTextEntry />
       <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? 'Masuk...' : 'Masuk'}</Text>

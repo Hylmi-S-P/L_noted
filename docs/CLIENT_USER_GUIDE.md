@@ -5,7 +5,7 @@ Panduan ini untuk pemilik/operator laundry.
 ## 1. Login
 
 1. Buka aplikasi L-Note.
-2. Isi email dan password.
+2. Isi username/email dan password.
 3. Tekan `Masuk`.
 
 Jika gagal, cek koneksi internet atau hubungi admin.

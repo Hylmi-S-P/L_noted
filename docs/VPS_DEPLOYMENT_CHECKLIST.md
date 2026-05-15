@@ -239,5 +239,6 @@ Setelah itu, client bisa menambah pelanggan dan layanan real dari menu `Pengatur
 Catatan login:
 
 - Aplikasi sudah menyimpan token login memakai secure storage.
+- Username login boleh memakai nama sederhana seperti `sumiati`, tidak wajib email asli.
 - Setelah client login sekali, biasanya tidak perlu isi email/password lagi sampai logout/token invalid.
 - App tidak menyimpan password mentah.

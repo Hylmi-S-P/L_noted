@@ -154,6 +154,7 @@ Setelah login, client dapat menambah data real dari `Pengaturan`.
 Auto-login:
 
 - App menyimpan token login dengan `expo-secure-store`.
+- Username login boleh memakai nama sederhana seperti `sumiati`, tidak wajib email asli.
 - Client login sekali, lalu app akan masuk otomatis selama token masih valid dan user tidak logout.
 - App tidak menyimpan password mentah.
 
