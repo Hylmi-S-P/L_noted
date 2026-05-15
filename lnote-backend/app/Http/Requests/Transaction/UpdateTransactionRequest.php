@@ -14,8 +14,8 @@ class UpdateTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['nullable', 'string', 'in:pending,proses,selesai,diambil'],
-            'payment_status' => ['nullable', 'string', 'in:belum_lunas,lunas'],
+            'status' => ['nullable', 'string', 'in:pending,proses,selesai,diambil,process,done,taken'],
+            'payment_status' => ['nullable', 'in:belum_lunas,lunas,paid,unpaid,0,1,true,false'],
             'notes' => ['nullable', 'string'],
             'due_date' => ['nullable', 'date'],
         ];

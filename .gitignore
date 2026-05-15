@@ -9,4 +9,16 @@ Thumbs.db
 .agents/
 .context/
 .sigmap/
+.claude/
+.claude-flow/
+.commandcode/
+.swarm/
+.mcp.json
+logs/
+ruvector.db
 skills-lock.json
+
+# Local runtime/secrets
+lnote-backend/storage/keys/
+lnote-backend/laravel-serve-*.log
+lnote-backend/laravel-serve-*.err.log

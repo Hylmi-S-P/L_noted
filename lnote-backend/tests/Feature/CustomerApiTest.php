@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Customer;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -39,6 +40,14 @@ class CustomerApiTest extends TestCase
             ->assertJsonPath('data.name', 'Budi');
 
         $this->withHeaders($this->authHeaderFor($user))
+            ->postJson('/api/customers', [
+                'name' => 'Sari',
+                'phone_number' => '089999',
+            ])
+            ->assertStatus(201)
+            ->assertJsonPath('data.phone_number', '089999');
+
+        $this->withHeaders($this->authHeaderFor($user))
             ->getJson('/api/customers')
             ->assertOk()
             ->assertJsonPath('success', true);
@@ -56,7 +65,7 @@ class CustomerApiTest extends TestCase
     public function test_authenticated_user_can_update_customer(): void
     {
         $user = User::factory()->create();
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create(['user_id' => $user->id]);
 
         $this->withHeaders($this->authHeaderFor($user))
             ->putJson('/api/customers/'.$customer->id, [
@@ -65,5 +74,33 @@ class CustomerApiTest extends TestCase
             ])
             ->assertOk()
             ->assertJsonPath('data.name', 'Updated Name');
+    }
+
+    public function test_user_can_delete_unused_own_customer(): void
+    {
+        $user = User::factory()->create();
+        $customer = Customer::factory()->create(['user_id' => $user->id]);
+
+        $this->withHeaders($this->authHeaderFor($user))
+            ->deleteJson('/api/customers/'.$customer->id)
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseMissing('customers', ['id' => $customer->id]);
+    }
+
+    public function test_customer_with_transactions_cannot_be_deleted(): void
+    {
+        $user = User::factory()->create();
+        $customer = Customer::factory()->create(['user_id' => $user->id]);
+        Transaction::factory()->create([
+            'user_id' => $user->id,
+            'customer_id' => $customer->id,
+        ]);
+
+        $this->withHeaders($this->authHeaderFor($user))
+            ->deleteJson('/api/customers/'.$customer->id)
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Pelanggan ini sudah punya transaksi, jadi tidak bisa dihapus.');
     }
 }

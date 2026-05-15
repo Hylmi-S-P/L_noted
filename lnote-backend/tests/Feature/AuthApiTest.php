@@ -65,4 +65,19 @@ class AuthApiTest extends TestCase
 
         $this->assertCount(0, $user->fresh()->tokens);
     }
+
+    public function test_authenticated_user_can_store_device_token(): void
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('test-token')->plainTextToken;
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/auth/device-token', [
+                'device_token' => str_repeat('a', 140),
+            ])
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->assertNotNull($user->fresh()->fcm_device_token);
+    }
 }

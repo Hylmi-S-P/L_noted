@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\StoreDeviceTokenRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
@@ -37,5 +38,15 @@ class AuthController extends Controller
         $user?->currentAccessToken()?->delete();
 
         return $this->successResponse(null, 'Logout successful.');
+    }
+
+    public function storeDeviceToken(StoreDeviceTokenRequest $request)
+    {
+        $user = auth()->user();
+        $user->update([
+            'fcm_device_token' => $request->validated('device_token'),
+        ]);
+
+        return $this->successResponse(null, 'Device token saved.');
     }
 }

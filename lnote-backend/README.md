@@ -149,6 +149,8 @@ GOOGLE_CLOUD_KEY_FILE=path/to/service-account-key.json
 
 FIREBASE_PROJECT_ID=your-firebase-project
 FIREBASE_CREDENTIALS=path/to/firebase-credentials.json
+GOOGLE_VISION_API_KEY=your_google_vision_api_key
+FCM_SERVER_KEY=your_fcm_server_key
 
 QUEUE_CONNECTION=database
 CACHE_DRIVER=file
@@ -172,6 +174,7 @@ All API responses use:
 POST   /api/auth/login           # Login
 POST   /api/auth/logout          # Logout
 GET    /api/auth/me              # Current user
+POST   /api/auth/device-token    # Save FCM device token
 ```
 Login request body:
 ```json
@@ -204,13 +207,23 @@ PATCH  /api/customers/{id}       # Update
 
 ### OCR
 ```
-POST   /api/ocr/scan             # Upload & scan receipt
+POST   /api/ocr/scan             # Upload & scan receipt (throttle: 20/min/user)
 ```
 
 ### Reports
 ```
 GET    /api/reports/daily        # Daily summary
 GET    /api/reports/summary      # Date range summary
+GET    /api/reports/export       # CSV export (?from=YYYY-MM-DD&to=YYYY-MM-DD)
+```
+
+### Service Prices
+```
+GET    /api/service-prices
+POST   /api/service-prices
+GET    /api/service-prices/{id}
+PUT    /api/service-prices/{id}
+DELETE /api/service-prices/{id}
 ```
 
 ## 🔐 Security
@@ -295,4 +308,3 @@ chown -R www-data:www-data storage/
 - [Database Schema](./docs/DATABASE.md)
 - [Deployment Guide](./docs/DEPLOYMENT.md)
 - [OCR Integration](./docs/OCR.md)
-
