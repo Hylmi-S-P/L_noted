@@ -116,6 +116,47 @@ npx expo run:android
 - Buka laporan.
 - Cek backup database.
 
+## 5a. Buat Akun Client Dan Bersihkan Demo
+
+Jalankan di VPS setelah migrate/seed selesai:
+
+```bash
+cd /var/www/L_noted/lnote-backend
+php artisan lnote:prepare-client \
+  --name="Nama Laundry" \
+  --email="client@example.com" \
+  --password="GANTI_PASSWORD_KUAT" \
+  --delete-demo-users \
+  --delete-demo-customers
+```
+
+Perintah ini:
+
+- membuat atau update akun client asli
+- menghapus akun demo `test@example.com` jika belum punya transaksi
+- menghapus customer demo seperti `Ibu Siti`, `Pak Budi`, `Bu Rina` jika belum punya transaksi
+- membiarkan layanan default tetap ada agar client punya pilihan awal
+
+Jika layanan default juga mau dihapus:
+
+```bash
+php artisan lnote:prepare-client \
+  --name="Nama Laundry" \
+  --email="client@example.com" \
+  --password="GANTI_PASSWORD_KUAT" \
+  --delete-demo-users \
+  --delete-demo-customers \
+  --delete-default-services
+```
+
+Setelah login, client dapat menambah data real dari `Pengaturan`.
+
+Auto-login:
+
+- App menyimpan token login dengan `expo-secure-store`.
+- Client login sekali, lalu app akan masuk otomatis selama token masih valid dan user tidak logout.
+- App tidak menyimpan password mentah.
+
 ## 6. Backup Manual
 
 Di VPS:

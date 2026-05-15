@@ -10,6 +10,8 @@ Panduan ini untuk pemilik/operator laundry.
 
 Jika gagal, cek koneksi internet atau hubungi admin.
 
+Setelah berhasil login, aplikasi biasanya akan masuk otomatis saat dibuka lagi. Jika pengguna menekan logout, email dan password perlu diisi ulang.
+
 ## 2. Tambah Transaksi
 
 1. Tekan `Tambah Transaksi`.

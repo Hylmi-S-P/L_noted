@@ -205,3 +205,39 @@ Jika menjalankan dari repo:
 BASE_URL='http://IP_VPS' bash scripts/vps-smoke-test-lnote.sh
 DB_PASSWORD='GANTI_PASSWORD_KUAT' bash scripts/vps-backup-lnote.sh
 ```
+
+## 7. Siapkan Akun Client Dan Hapus Demo
+
+Setelah deploy pertama, buat akun client asli dan hapus demo customer:
+
+```bash
+cd /var/www/L_noted/lnote-backend
+php artisan lnote:prepare-client \
+  --name="Nama Laundry" \
+  --email="client@example.com" \
+  --password="GANTI_PASSWORD_KUAT" \
+  --delete-demo-users \
+  --delete-demo-customers
+```
+
+Default layanan seperti `Cuci + Kering` tetap disimpan karena biasanya berguna sebagai data awal.
+
+Jika benar-benar mau mulai layanan dari kosong juga:
+
+```bash
+php artisan lnote:prepare-client \
+  --name="Nama Laundry" \
+  --email="client@example.com" \
+  --password="GANTI_PASSWORD_KUAT" \
+  --delete-demo-users \
+  --delete-demo-customers \
+  --delete-default-services
+```
+
+Setelah itu, client bisa menambah pelanggan dan layanan real dari menu `Pengaturan`.
+
+Catatan login:
+
+- Aplikasi sudah menyimpan token login memakai secure storage.
+- Setelah client login sekali, biasanya tidak perlu isi email/password lagi sampai logout/token invalid.
+- App tidak menyimpan password mentah.

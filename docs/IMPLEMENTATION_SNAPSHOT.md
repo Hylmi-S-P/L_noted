@@ -864,3 +864,46 @@ Production notes:
   - `EXPO_PUBLIC_ENABLE_OCR=false`
 - If using an IP only, use HTTP for first deploy.
 - If using a real domain, enable HTTPS and rebuild the Android app with the HTTPS API URL.
+
+## Latest note (cache and production account handling, 2026-05-15)
+
+Cache decision:
+- Current frontend only persists the auth token through `expo-secure-store`.
+- Customer, service, transaction, and report data are fetched from the backend and are not cached for offline use.
+- Recommended future improvement: cache last successful `customers` and `service-prices` responses for read-only display when the server is unstable.
+- Transaction creation should remain online-only for now to avoid duplicate nota/sync conflicts.
+- Suggested offline wording if read-cache is added later: `Data ditampilkan dari cache. Nyalakan server untuk menyimpan transaksi.`
+
+Account/data separation note:
+- Transactions are user-scoped with `transactions.user_id`, so different login accounts do not see each other's transactions.
+- Customers and services created inside the app are user-scoped with `user_id = auth()->id()`.
+- Seeded/demo customers and service prices currently have `user_id = null`, so they are visible as shared default data for all users.
+- For production client account creation, create a real user on VPS and avoid using `test@example.com` as the client login.
+- If demo customers should not appear in production, remove the seeded demo customer rows or change the seed strategy before final handoff.
+
+## Latest continuation (client account and demo cleanup command, 2026-05-15)
+
+Scope completed:
+- Added Laravel production helper command in `lnote-backend/routes/console.php`:
+  - `php artisan lnote:prepare-client`
+- Command behavior:
+  - requires `--name`, `--email`, and `--password`
+  - creates or updates a real client user account
+  - optional `--delete-demo-users` removes `test@example.com` only when it has no transactions
+  - optional `--delete-demo-customers` removes seeded demo customers only when they have no transactions
+  - optional `--delete-default-services` removes default shared services only when they have no transactions
+- Updated docs with client-account cleanup steps:
+  - `docs/VPS_DEPLOYMENT_CHECKLIST.md`
+  - `docs/LNOTE_DEPLOY_RUNBOOK.md`
+  - `docs/CLIENT_USER_GUIDE.md`
+
+Operational guidance:
+- Recommended production cleanup command after deploy:
+  - `php artisan lnote:prepare-client --name="Nama Laundry" --email="client@example.com" --password="GANTI_PASSWORD_KUAT" --delete-demo-users --delete-demo-customers`
+- Keep default services unless the client wants a completely empty service list.
+- The app already supports auto-login by storing the auth token in `expo-secure-store`; it does not store raw passwords.
+
+Validation:
+- `php artisan lnote:prepare-client` tested locally with a temporary smoke user.
+- Local demo data was restored afterward with `php artisan db:seed`.
+- `php artisan list lnote` shows `lnote:prepare-client` registered.
